@@ -103,8 +103,8 @@ namespace Monopoly_Test
                     Pallet = pallet,
                     MaxExpirationDate = pallet.Boxes.Max(box => box.CalculatedExpirationDate)
                 })
-                .OrderByDescending(p => p.MaxExpirationDate) // Сортировка по убыванию максимального срока годности
-                .ThenBy(p => p.Pallet.TotalVolume)          // Сортировка по возрастанию объема
+                .OrderByDescending(pallet => pallet.MaxExpirationDate) // Сортировка по убыванию максимального срока годности
+                .ThenBy(pallet => pallet.Pallet.TotalVolume)          // Сортировка по возрастанию объема
                 .Take(3)                                   // Выбор 3 паллет
                 .ToList();
 
@@ -129,6 +129,66 @@ namespace Monopoly_Test
 
             Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
             Console.ReadKey();
+        }
+
+        public void BoxDialogue(List<Box> boxes)
+        {
+            if (boxes != null && boxes.Count > 0)
+            {
+                int selectedIndex = 0;
+                ConsoleKey key;
+
+                do
+                {
+                    Console.Clear();
+                    Console.WriteLine("Выберите коробку (стрелками ↑ ↓, Enter для выбора):\n");
+
+                    for (int i = 0; i < boxes.Count; i++)
+                    {
+                        if (i == selectedIndex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                        }
+
+                        Console.WriteLine($"  Коробка {boxes[i].Id}");
+
+                        Console.ResetColor();
+                    }
+
+                    key = Console.ReadKey(true).Key;
+
+                    if (key == ConsoleKey.UpArrow)
+                    {
+                        selectedIndex = (selectedIndex == 0) ? boxes.Count - 1 : selectedIndex - 1;
+                    }
+                    else if (key == ConsoleKey.DownArrow)
+                    {
+                        selectedIndex = (selectedIndex == boxes.Count - 1) ? 0 : selectedIndex + 1;
+                    }
+                    else if (key == ConsoleKey.Enter)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"Вы выбрали коробку {boxes[selectedIndex].Id}\n");
+                        Console.WriteLine($"Ширина: {boxes[selectedIndex].Width} см");
+                        Console.WriteLine($"Высота: {boxes[selectedIndex].Height} см");
+                        Console.WriteLine($"Глубина: {boxes[selectedIndex].Depth} см");
+                        Console.WriteLine($"Вес: {boxes[selectedIndex].Weight} кг");
+                        Console.WriteLine($"Объём: {boxes[selectedIndex].Volume} м3");
+                        Console.WriteLine($"Срок годности: {boxes[selectedIndex].CalculatedExpirationDate.ToShortDateString()}\n");
+
+                        Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
+                        Console.ReadKey();
+                        break;
+                    }
+
+                } while (true);
+            }
+            else
+            {
+                Console.WriteLine("Коробки отсутствуют.");
+                Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
+                Console.ReadKey();
+            }
         }
     }
 }

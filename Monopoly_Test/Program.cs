@@ -62,17 +62,10 @@ namespace Monopoly_Test
                         var pallets = getData.GetPallets().Result;
 
                         if (pallets != null)
-                        {
-                            // Сортировка по ExpirationDate от самой дальней даты к ближайшей
-                            pallets = pallets
-                                .OrderByDescending(pallet => pallet.ExpirationDate ?? DateTime.MinValue)
-                                .ToList();
-
                             menu.PalletDialogue(pallets);
-                        }
                         break;
                     case 1:
-                        Console.WriteLine("Загрузка паллет...");
+                        Console.WriteLine("Загрузка топ-3 паллет...");
 
                         pallets = getData.GetPallets().Result;
 
@@ -87,8 +80,12 @@ namespace Monopoly_Test
                         }
                         break;
                     case 2:
+                        Console.WriteLine("Загрузка коробок...");
 
-                        Console.ReadKey();
+                        var boxes = getData.GetBoxes().Result;
+
+                        if (boxes != null)
+                            menu.BoxDialogue(boxes);
                         break;
                     case 3:
 
