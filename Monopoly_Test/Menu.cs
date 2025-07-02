@@ -57,7 +57,7 @@ namespace Monopoly_Test
                         Console.WriteLine($"Глубина: {pallets[selectedIndex].Depth} см");
                         Console.WriteLine($"Собственный вес: {pallets[selectedIndex].OwnWeight} кг");
                         Console.WriteLine($"Общий вес: {pallets[selectedIndex].TotalWeight} кг");
-                        Console.WriteLine($"Объём: {pallets[selectedIndex].TotalVolume} м3");
+                        Console.WriteLine($"Общий объём: {pallets[selectedIndex].TotalVolume} м3");
                         Console.WriteLine($"Срок годности: {(pallets[selectedIndex].ExpirationDate.HasValue ?
                             pallets[selectedIndex].ExpirationDate.Value.ToShortDateString() : "Нет")}\n");
 

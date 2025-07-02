@@ -11,6 +11,7 @@ namespace Monopoly_Test
                 "Просмотреть коробки", "Добавить паллету", "Добавить коробку", "Выход" };
             int selectedIndex = 0;
             GetData getData = new GetData();
+            InsertData insertData = new InsertData();
             Menu menu = new Menu();
 
             bool isWorks = true;
@@ -88,11 +89,156 @@ namespace Monopoly_Test
                             menu.BoxDialogue(boxes);
                         break;
                     case 3:
+                        // Добавление паллеты
+                        Pallet newPallet = new Pallet();
 
+                        Console.WriteLine("Вы хотите использовать стандартные значения для паллеты? (y/n):");
+                        string? useDefaults = Console.ReadLine()?.Trim().ToLower();
+
+                        if (useDefaults == "y" || useDefaults == "н")
+                        {
+                            newPallet.Width = 80;
+                            newPallet.Height = 14.4;
+                            newPallet.Depth = 120;
+                            newPallet.CreatedAt = DateTime.Now;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Введите ширину паллеты (см):");
+                            double width;
+                            while (!double.TryParse(Console.ReadLine(), out width) || width <= 0)
+                            {
+                                Console.WriteLine("Некорректное значение. Введите положительное число для ширины:");
+                            }
+                            newPallet.Width = width;
+
+                            Console.WriteLine("Введите высоту паллеты (см):");
+                            double height;
+                            while (!double.TryParse(Console.ReadLine(), out height) || height <= 0)
+                            {
+                                Console.WriteLine("Некорректное значение. Введите положительное число для высоты:");
+                            }
+                            newPallet.Height = height;
+
+                            Console.WriteLine("Введите глубину паллеты (см):");
+                            double depth;
+                            while (!double.TryParse(Console.ReadLine(), out depth) || depth <= 0)
+                            {
+                                Console.WriteLine("Некорректное значение. Введите положительное число для глубины:");
+                            }
+                            newPallet.Depth = depth;
+
+                            Console.WriteLine("Введите дату создания паллеты (в формате ГГГГ-ММ-ДД):");
+                            DateTime createdAt;
+                            while (!DateTime.TryParse(Console.ReadLine(), out createdAt))
+                            {
+                                Console.WriteLine("Некорректное значение. Введите дату в формате ГГГГ-ММ-ДД:");
+                            }
+                            newPallet.CreatedAt = createdAt;
+                        }
+
+                        var result = insertData.AddPallet(newPallet).Result;
+                        if (result)
+                            Console.WriteLine("Паллета успешно добавлена!");
+                        else
+                            Console.WriteLine("Ошибка при добавлении паллеты.");
+
+                        Console.WriteLine("Нажмите любую клавишу для продолжения...");
                         Console.ReadKey();
                         break;
                     case 4:
+                        // Добавление коробки
+                        Box newBox = new Box();
 
+                        Console.WriteLine("Введите ширину коробки (см):");
+                        double boxWidth;
+                        while (!double.TryParse(Console.ReadLine(), out boxWidth) || boxWidth <= 0)
+                        {
+                            Console.WriteLine("Некорректное значение. Введите положительное число для ширины:");
+                        }
+                        newBox.Width = boxWidth;
+
+                        Console.WriteLine("Введите высоту коробки (см):");
+                        double boxHeight;
+                        while (!double.TryParse(Console.ReadLine(), out boxHeight) || boxHeight <= 0)
+                        {
+                            Console.WriteLine("Некорректное значение. Введите положительное число для высоты:");
+                        }
+                        newBox.Height = boxHeight;
+
+                        Console.WriteLine("Введите глубину коробки (см):");
+                        double boxDepth;
+                        while (!double.TryParse(Console.ReadLine(), out boxDepth) || boxDepth <= 0)
+                        {
+                            Console.WriteLine("Некорректное значение. Введите положительное число для глубины:");
+                        }
+                        newBox.Depth = boxDepth;
+
+                        Console.WriteLine("Введите вес коробки (кг):");
+                        double boxWeight;
+                        while (!double.TryParse(Console.ReadLine(), out boxWeight) || boxWeight <= 0)
+                        {
+                            Console.WriteLine("Некорректное значение. Введите положительное число для веса:");
+                        }
+                        newBox.Weight = boxWeight;
+
+                        Console.WriteLine("Введите дату производства коробки (в формате ГГГГ-ММ-ДД) или оставьте пустым:");
+                        string? productionDateInput = Console.ReadLine()?.Trim();
+                        DateTime? productionDate = null;
+
+                        if (!string.IsNullOrEmpty(productionDateInput))
+                        {
+                            while (!DateTime.TryParse(productionDateInput, out DateTime parsedProductionDate))
+                            {
+                                Console.WriteLine("Некорректное значение. Введите дату в формате ГГГГ-ММ-ДД или оставьте пустым:");
+                                productionDateInput = Console.ReadLine()?.Trim();
+                                if (string.IsNullOrEmpty(productionDateInput))
+                                {
+                                    break;
+                                }
+                            }
+                            productionDate = string.IsNullOrEmpty(productionDateInput) ? null : DateTime.Parse(productionDateInput);
+                        }
+
+                        Console.WriteLine("Введите дату истечения срока годности коробки (в формате ГГГГ-ММ-ДД) или оставьте пустым:");
+                        string? expirationDateInput = Console.ReadLine()?.Trim();
+                        DateTime? expirationDate = null;
+
+                        if (!string.IsNullOrEmpty(expirationDateInput))
+                        {
+                            while (!DateTime.TryParse(expirationDateInput, out DateTime parsedExpirationDate))
+                            {
+                                Console.WriteLine("Некорректное значение. Введите дату в формате ГГГГ-ММ-ДД или оставьте пустым:");
+                                expirationDateInput = Console.ReadLine()?.Trim();
+                                if (string.IsNullOrEmpty(expirationDateInput))
+                                {
+                                    break;
+                                }
+                            }
+                            expirationDate = string.IsNullOrEmpty(expirationDateInput) ? null : DateTime.Parse(expirationDateInput);
+                        }
+
+                        // Проверка: хотя бы одна из дат должна быть указана
+                        if (productionDate == null && expirationDate == null)
+                        {
+                            Console.WriteLine("Вы должны указать хотя бы одну дату (производства или истечения срока годности)!");
+                            Console.WriteLine("Попробуйте снова.");
+                            Console.ReadKey();
+                            break;
+                        }
+
+                        newBox.ProductionDate = productionDate;
+                        newBox.ExpirationDate = expirationDate;
+
+                        newBox.PalletId = null; // Изначально коробка не привязана к паллете
+
+                        var boxResult = insertData.AddBox(newBox).Result;
+                        if (boxResult)
+                            Console.WriteLine("Коробка успешно добавлена!");
+                        else
+                            Console.WriteLine("Ошибка при добавлении коробки.");
+
+                        Console.WriteLine("Нажмите любую клавишу для продолжения...");
                         Console.ReadKey();
                         break;
                     case 5:

@@ -10,7 +10,7 @@ namespace Monopoly_Test
         public long Id { get; set; }
 
         // Идентификатор паллеты, на которой находится коробка.
-        public long PalletId { get; set; }
+        public long? PalletId { get; set; }
 
         // Ширина коробки (в см или мм — в зависимости от системы).
         public double Width { get; set; }
@@ -34,7 +34,7 @@ namespace Monopoly_Test
         public DateTime CreatedAt { get; set; }
 
         // Вычисляемое свойство: объём коробки (Ш × В × Г).
-        public double Volume => Width * Height * Depth;
+        public double Volume => (Width * Height * Depth)/1000000;
 
         // Вычисляемая дата истечения срока годности:
         // если указана ExpirationDate — используется она,
