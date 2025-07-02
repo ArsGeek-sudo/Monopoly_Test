@@ -1,4 +1,6 @@
-﻿namespace Monopoly_Test
+﻿using SqlKata.Compilers;
+
+namespace Monopoly_Test
 {
     internal class Program
     {
