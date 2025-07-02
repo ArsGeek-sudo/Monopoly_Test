@@ -1,39 +1,41 @@
 ﻿using SqlKata.Execution;
 using SqlKata.Compilers;
 using Npgsql;
-using System.Collections.Generic;
 
 namespace Monopoly_Test
 {
     internal class GetData
     {
         const string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=1;Database=monopoly_test";
+        PostgresCompiler compiler = new PostgresCompiler();
 
-        /// <summary>
-        /// Получает все паллеты из таблицы pallets.
-        /// </summary>
+        // Получает все паллеты из таблицы pallets.
         public async Task<List<Pallet>?> GetPallets()
         {
+            List<Pallet> pallets = new List<Pallet>();
+
             try
             {
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
-                    PostgresCompiler compiler = new PostgresCompiler();
                     QueryFactory db = new QueryFactory(connection, compiler);
 
                     var result = await db.Query("pallets").GetAsync();
 
-                    List<Pallet> pallets = new List<Pallet>();
+                    List<Box> boxes = await GetBoxesById(result);
 
                     foreach (var row in result)
                     {
+                        var sortedBoxes = boxes.Where(b => b.PalletId == row.id).ToList();
+
                         pallets.Add(new Pallet
                         {
                             Id = row.id,
                             Width = row.width,
                             Height = row.height,
                             Depth = row.depth,
-                            CreatedAt = row.created_at
+                            CreatedAt = row.created_at,
+                            Boxes = sortedBoxes
                         });
                     }
 
@@ -42,31 +44,28 @@ namespace Monopoly_Test
             }
             catch (NpgsqlException ex)
             {
-                Console.WriteLine("Ошибка PostgreSQL!\n", ex.Message);
+                Console.WriteLine("Ошибка PostgreSQL при получении палет!\n" + ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка!\n", ex.Message);
+                Console.WriteLine("Ошибка при получении палет!\n" + ex.Message);
             }
 
-            return null;
+            return pallets;
         }
 
-        /// <summary>
-        /// Получает все коробки из таблицы boxes.
-        /// </summary>
+        // Получает все коробки из таблицы boxes.
         public async Task<List<Box>?> GetBoxes()
         {
+            List<Box> boxes = new List<Box>();
+
             try
             {
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
-                    PostgresCompiler compiler = new PostgresCompiler();
                     QueryFactory db = new QueryFactory(connection, compiler);
 
                     var result = await db.Query("boxes").GetAsync();
-
-                    List<Box> boxes = new List<Box>();
 
                     foreach (var row in result)
                     {
@@ -89,14 +88,65 @@ namespace Monopoly_Test
             }
             catch (NpgsqlException ex)
             {
-                Console.WriteLine("Ошибка PostgreSQL!\n", ex.Message);
+                Console.WriteLine("Ошибка PostgreSQL при получении коробок!\n" + ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка!\n", ex.Message);
+                Console.WriteLine("Ошибка при получении коробок!\n" + ex.Message);
             }
 
-            return null;
+            return boxes;
+        }
+
+        public async Task<List<Box>> GetBoxesById(IEnumerable<dynamic> palletRows)
+        {
+            List<Box> boxes = new List<Box>();
+
+            try
+            {
+                using (var connection = new NpgsqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    QueryFactory db = new QueryFactory(connection, compiler);
+
+                    // Извлекаем все pallet_id
+                    var palletIds = palletRows.Select(r => (int)r.id).ToList();
+
+                    if (palletIds.Count == 0)
+                        return boxes;
+
+                    // Получаем коробки, у которых pallet_id содержится в palletIds
+                    var boxResult = await db.Query("boxes")
+                        .WhereIn("pallet_id", palletIds)
+                        .GetAsync();
+
+                    foreach (var row in boxResult)
+                    {
+                        boxes.Add(new Box
+                        {
+                            Id = row.id,
+                            PalletId = row.pallet_id,
+                            Width = row.width,
+                            Height = row.height,
+                            Depth = row.depth,
+                            Weight = row.weight,
+                            ProductionDate = row.production_date,
+                            ExpirationDate = row.expiration_date
+                        });
+                    }
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                Console.WriteLine("Ошибка PostgreSQL при получении коробок!\n" + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка при получении коробок!\n" + ex.Message);
+            }
+
+            return boxes;
         }
     }
 }

@@ -3,66 +3,42 @@ using SqlKata.Compilers;
 
 namespace Monopoly_Test
 {
-    /// <summary>
-    /// Представляет коробку, размещённую на паллете.
-    /// </summary>
+    // Представляет коробку, размещённую на паллете.
     public class Box
     {
-        /// <summary>
-        /// Уникальный идентификатор коробки.
-        /// </summary>
+        // Уникальный идентификатор коробки.
         public long Id { get; set; }
 
-        /// <summary>
-        /// Идентификатор паллеты, на которой находится коробка.
-        /// </summary>
+        // Идентификатор паллеты, на которой находится коробка.
         public long PalletId { get; set; }
 
-        /// <summary>
-        /// Ширина коробки (в см или мм — в зависимости от системы).
-        /// </summary>
+        // Ширина коробки (в см или мм — в зависимости от системы).
         public double Width { get; set; }
 
-        /// <summary>
-        /// Высота коробки.
-        /// </summary>
+        // Высота коробки.
         public double Height { get; set; }
 
-        /// <summary>
-        /// Глубина (длина) коробки.
-        /// </summary>
+        // Глубина (длина) коробки.
         public double Depth { get; set; }
 
-        /// <summary>
-        /// Вес коробки.
-        /// </summary>
+        // Вес коробки.
         public double Weight { get; set; }
 
-        /// <summary>
-        /// Дата производства коробки. Может быть null.
-        /// </summary>
+        // Дата производства коробки. Может быть null.
         public DateTime? ProductionDate { get; set; }
 
-        /// <summary>
-        /// Дата истечения срока годности. Может быть null.
-        /// </summary>
+        // Дата истечения срока годности. Может быть null.
         public DateTime? ExpirationDate { get; set; }
 
-        /// <summary>
-        /// Дата создания записи о коробке.
-        /// </summary>
+        // Дата создания записи о коробке.
         public DateTime CreatedAt { get; set; }
 
-        /// <summary>
-        /// Вычисляемое свойство: объём коробки (Ш × В × Г).
-        /// </summary>
+        // Вычисляемое свойство: объём коробки (Ш × В × Г).
         public double Volume => Width * Height * Depth;
 
-        /// <summary>
-        /// Вычисляемая дата истечения срока годности:
-        /// если указана ExpirationDate — используется она,
-        /// иначе вычисляется как ProductionDate + 100 дней.
-        /// </summary>
+        // Вычисляемая дата истечения срока годности:
+        // если указана ExpirationDate — используется она,
+        // иначе вычисляется как ProductionDate + 100 дней.
         public DateTime CalculatedExpirationDate =>
             ExpirationDate ?? (ProductionDate.HasValue ? ProductionDate.Value.AddDays(100) : DateTime.MinValue);
     }
