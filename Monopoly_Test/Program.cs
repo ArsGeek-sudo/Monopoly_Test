@@ -6,7 +6,9 @@ namespace Monopoly_Test
     {
         static void Main(string[] args)
         {
-            string[] options = { "Просмотреть паллеты", "Просмотреть коробки", "Добавить паллету", "Добавить коробку", "Выход" };
+            string[] options = { "Просмотреть паллеты", "Отобразить палеты с наибольшим сроком годности\n" +
+                    "  отсортированные по возрастанию объёма",
+                "Просмотреть коробки", "Добавить паллету", "Добавить коробку", "Выход" };
             int selectedIndex = 0;
             GetData getData = new GetData();
             Menu menu = new Menu();
@@ -70,8 +72,19 @@ namespace Monopoly_Test
                         }
                         break;
                     case 1:
-                        Console.WriteLine("Загрузка коробок...");
-                        Console.ReadKey();
+                        Console.WriteLine("Загрузка паллет...");
+
+                        pallets = getData.GetPallets().Result;
+
+                        if (pallets != null)
+                        {
+                            // Сортировка по ExpirationDate от самой дальней даты к ближайшей
+                            pallets = pallets
+                                .OrderByDescending(pallet => pallet.ExpirationDate ?? DateTime.MinValue)
+                                .ToList();
+
+                            menu.ShowTopPallets(pallets);
+                        }
                         break;
                     case 2:
 
@@ -82,6 +95,10 @@ namespace Monopoly_Test
                         Console.ReadKey();
                         break;
                     case 4:
+
+                        Console.ReadKey();
+                        break;
+                    case 5:
                         isWorks = false;
                         break;
                 }

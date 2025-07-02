@@ -87,5 +87,48 @@ namespace Monopoly_Test
             }
         }
 
+        public void ShowTopPallets(List<Pallet> pallets)
+        {
+            if (pallets == null || pallets.Count == 0)
+            {
+                Console.WriteLine("Паллеты отсутствуют.");
+                return;
+            }
+
+            // Фильтрация паллет, которые содержат коробки
+            var filteredPallets = pallets
+                .Where(pallet => pallet.Boxes != null && pallet.Boxes.Count > 0)
+                .Select(pallet => new
+                {
+                    Pallet = pallet,
+                    MaxExpirationDate = pallet.Boxes.Max(box => box.CalculatedExpirationDate)
+                })
+                .OrderByDescending(p => p.MaxExpirationDate) // Сортировка по убыванию максимального срока годности
+                .ThenBy(p => p.Pallet.TotalVolume)          // Сортировка по возрастанию объема
+                .Take(3)                                   // Выбор 3 паллет
+                .ToList();
+
+            if (filteredPallets.Count == 0)
+            {
+                Console.WriteLine("Нет паллет с коробками.");
+                Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Топ-3 паллеты с коробками с наибольшим сроком годности, отсортированные по объему:\n");
+
+            foreach (var item in filteredPallets)
+            {
+                var pallet = item.Pallet;
+                Console.WriteLine($"Паллета {pallet.Id}:");
+                Console.WriteLine($"  Общий объем: {pallet.TotalVolume} м3");
+                Console.WriteLine($"  Палета годна до: {item.MaxExpirationDate.ToShortDateString()}");
+                Console.WriteLine($"  Количество коробок: {pallet.Boxes.Count}\n");
+            }
+
+            Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
+            Console.ReadKey();
+        }
     }
 }

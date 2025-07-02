@@ -20,21 +20,21 @@ namespace Monopoly_Test
                 {
                     QueryFactory db = new QueryFactory(connection, compiler);
 
-                    var result = await db.Query("pallets").GetAsync();
+                    var palletsData = await db.Query("pallets").GetAsync();
 
-                    List<Box> boxes = await GetBoxesById(result);
+                    List<Box> boxes = await GetBoxesById(palletsData);
 
-                    foreach (var row in result)
+                    foreach (var pallet in palletsData)
                     {
-                        var sortedBoxes = boxes.Where(b => b.PalletId == row.id).ToList();
+                        var sortedBoxes = boxes.Where(box => box.PalletId == pallet.id).ToList();
 
                         pallets.Add(new Pallet
                         {
-                            Id = row.id,
-                            Width = row.width,
-                            Height = row.height,
-                            Depth = row.depth,
-                            CreatedAt = row.created_at,
+                            Id = pallet.id,
+                            Width = pallet.width,
+                            Height = pallet.height,
+                            Depth = pallet.depth,
+                            CreatedAt = pallet.created_at,
                             Boxes = sortedBoxes
                         });
                     }
@@ -111,7 +111,7 @@ namespace Monopoly_Test
                     QueryFactory db = new QueryFactory(connection, compiler);
 
                     // Извлекаем все pallet_id
-                    var palletIds = palletRows.Select(r => (int)r.id).ToList();
+                    var palletIds = palletRows.Select(palletData => (int)palletData.id).ToList();
 
                     if (palletIds.Count == 0)
                         return boxes;
