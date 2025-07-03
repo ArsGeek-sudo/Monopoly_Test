@@ -232,13 +232,15 @@ namespace Monopoly_Test
 
                         newBox.PalletId = null; // Изначально коробка не привязана к паллете
 
+                        menu.AddBoxToPallet(newBox);
+
                         var boxResult = insertData.AddBox(newBox).Result;
                         if (boxResult)
                             Console.WriteLine("Коробка успешно добавлена!");
                         else
                             Console.WriteLine("Ошибка при добавлении коробки.");
 
-                        Console.WriteLine("Нажмите любую клавишу для продолжения...");
+                        Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
                         Console.ReadKey();
                         break;
                     case 5:

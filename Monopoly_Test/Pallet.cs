@@ -43,7 +43,7 @@ namespace Monopoly_Test
 
         // Проверка, может ли коробка поместиться на паллету по габаритам (ширина и глубина).  
         public bool CanContain(Box box) =>
-            box.Width <= Width && box.Depth <= Depth;
+            box.Width <= Width && box.Height <= Depth;
 
         // Метод для вычисления объёма всех коробок.  
         private double GetBoxesVolume()

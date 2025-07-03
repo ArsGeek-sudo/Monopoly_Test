@@ -54,6 +54,51 @@ namespace Monopoly_Test
             return pallets;
         }
 
+        public async Task<Pallet?> GetPalletById(long id)
+        {
+            try
+            {
+                using (var connection = new NpgsqlConnection(connectionString))
+                {
+                    QueryFactory db = new QueryFactory(connection, compiler);
+
+                    // Выполняем запрос с условием по id
+                    var palletData = await db.Query("pallets").Where("id", id).FirstOrDefaultAsync();
+
+                    // Если паллета не найдена, возвращаем null
+                    if (palletData == null)
+                        return null;
+
+                    // Создаем список из одной паллеты для передачи в GetBoxesById
+                    var palletList = new List<dynamic> { palletData };
+                    List<Box> boxes = await GetBoxesById(palletList);
+
+                    // Фильтруем коробки для этой паллеты (хотя в списке boxes должны быть только коробки этой паллеты)
+                    var sortedBoxes = boxes.Where(box => box.PalletId == palletData.id).ToList();
+
+                    return new Pallet
+                    {
+                        Id = palletData.id,
+                        Width = palletData.width,
+                        Height = palletData.height,
+                        Depth = palletData.depth,
+                        CreatedAt = palletData.created_at,
+                        Boxes = sortedBoxes
+                    };
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                Console.WriteLine($"Ошибка PostgreSQL при получении паллеты по id {id}!\n" + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при получении паллеты по id - {id}!\n" + ex.Message);
+            }
+
+            return null;
+        }
+
         // Получает все коробки из таблицы boxes.
         public async Task<List<Box>?> GetBoxes()
         {

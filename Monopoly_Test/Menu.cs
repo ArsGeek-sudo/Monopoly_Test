@@ -8,6 +8,9 @@ namespace Monopoly_Test
 {
     internal class Menu
     {
+        GetData getData = new GetData();
+        InsertData insertData = new InsertData();
+
         int selectedIndex = 0;
 
         ConsoleKey key;
@@ -66,7 +69,8 @@ namespace Monopoly_Test
                             Console.WriteLine("Коробки на паллете:");
                             foreach (var box in pallets[selectedIndex].Boxes)
                             {
-                                Console.WriteLine($"  - Коробка {box.Id}: {box.Width}x{box.Height}x{box.Depth} м, вес {box.Weight} кг, срок годности {box.CalculatedExpirationDate.ToShortDateString()}");
+                                Console.WriteLine($"  - Коробка {box.Id}: {box.Width}x{box.Height}x{box.Depth} cм," +
+                                    $" вес {box.Weight} кг, срок годности {box.CalculatedExpirationDate.ToShortDateString()}");
                             }
                         }
                         else
@@ -108,9 +112,9 @@ namespace Monopoly_Test
                 .Take(3)                                   // Выбор 3 паллет
                 .ToList();
 
-            if (filteredPallets.Count == 0)
+            if (filteredPallets.Count < 3)
             {
-                Console.WriteLine("Нет паллет с коробками.");
+                Console.WriteLine("Нет паллет с коробками или паллет меньше трёх.");
                 Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
                 Console.ReadKey();
                 return;
@@ -176,11 +180,17 @@ namespace Monopoly_Test
                         Console.WriteLine($"Объём: {boxes[selectedIndex].Volume} м3");
                         Console.WriteLine($"Срок годности: {boxes[selectedIndex].CalculatedExpirationDate.ToShortDateString()}\n");
 
+                        if (boxes[selectedIndex].PalletId != null)
+                            Console.WriteLine($"Коробка размещена на паллете {boxes[selectedIndex].PalletId}\n");
+                        else
+                        {
+                            AddBoxToPallet(boxes[selectedIndex]);
+                        }
+
                         Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
                         Console.ReadKey();
                         break;
                     }
-
                 } while (true);
             }
             else
@@ -188,6 +198,40 @@ namespace Monopoly_Test
                 Console.WriteLine("Коробки отсутствуют.");
                 Console.WriteLine("\nНажмите любую клавишу чтобы продолжить");
                 Console.ReadKey();
+            }
+        }
+
+        public async void AddBoxToPallet(Box addBox)
+        {
+            Console.Write("Хотите разместить коробку на паллете? (y/n): ");
+
+            string? plaseBox = Console.ReadLine()?.Trim().ToLower();
+
+            if (plaseBox == "y" || plaseBox == "н")
+            {
+                while (true)
+                {
+                    Console.Write("Введите номер палеты целым числом: ");
+                    if (long.TryParse(Console.ReadLine(), out long id) && id > 0)
+                    {
+                        addBox.PalletId = id;
+
+                        Pallet pallet = getData.GetPalletById(id).Result;
+
+                        if (pallet != null && pallet.CanContain(addBox))
+                        {
+                            await insertData.UpdateBox(addBox);
+                            break;
+                        }
+                        else if (pallet != null)
+                            Console.WriteLine("Коробка не помещается на паллету!");
+                        else Console.WriteLine("Выбраной вами паллеты не существует!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Вы ввели неправильное значение, попробуйте ещё раз!");
+                    }
+                }
             }
         }
     }

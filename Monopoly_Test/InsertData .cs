@@ -85,5 +85,38 @@ namespace Monopoly_Test
 
             return false;
         }
+
+        // Метод для присвоения коробке паллеты
+        public async Task UpdateBox(Box box)
+        {
+            try
+            {
+                using (var connection = new NpgsqlConnection(connectionString))
+                {
+                    QueryFactory db = new QueryFactory(connection, compiler);
+
+                    await db.Query("boxes")
+                    .Where("pallet_id", box.PalletId)
+                    .UpdateAsync(new
+                    {
+                        width = box.Width,
+                        height = box.Height,
+                        depth = box.Depth,
+                        weight = box.Weight,
+                        production_date = box.ProductionDate,
+                        expiration_date = box.ExpirationDate,
+                        created_at = box.CreatedAt
+                    });
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                Console.WriteLine("Ошибка PostgreSQL при добавлении коробки!\n" + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка при добавлении коробки!\n" + ex.Message);
+            }
+        }
     }
 }
